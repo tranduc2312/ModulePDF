@@ -21,10 +21,18 @@ create table Comments (
 	deleteFlag varchar(1) default(0)
 );
 
+insert into FilePDF (fileName, pathFile) 
+values 
+ ('PDF Sample 1', '/pdf/PDF1.pdf')
+,('PDF Sample 2', '/pdf/PDF2.pdf');
 
-insert into FilePDF (fileName, pathFile, updateDate) values ('PDF Sample 1', '/pdf/PDF1.pdf', getdate());
-insert into Comments (contentCmt, positionX , positionY, pageNumber, idFilePDF, idUserCreate, updateDate)
-values ('Nội dung cmt 1', 300, 200, 1, 1000, 1000, getdate());
+insert into Comments (contentCmt, positionX , positionY, pageNumber, idFilePDF, idUserCreate)
+values 
+ (N'Nội dung cmt 1', 300, 200, 1, 1000, 1000)
+,(N'Nội dung cmt 2', 100, 200, 1, 1000, 1000)
+,(N'Nội dung cmt 3', 30, 600, 1, 1000, 1001)
+,(N'Nội dung cmt 4', 430, 230, 2, 1000, 1000)
+,(N'Nội dung cmt 5', 784, 456, 2, 1000, 1001);
 
 select * from FilePDF;
 select * from Comments;
