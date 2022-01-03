@@ -1,0 +1,35 @@
+﻿@model ModulePDF.Models.FilePDFViewModels
+
+@{
+    ViewBag.Title = "FilePDFDetail";
+}
+
+<h2>FilePDFDetail</h2>
+
+<div>
+    <h4>FilePDFViewModels</h4>
+    <hr />
+    <dl class="dl-horizontal">
+    </dl>
+</div>
+<p>
+    @Html.ActionLink(Model.FilePDF.PathFile, "Edit", new { /* id = Model.PrimaryKey */ }) |
+</p>
+
+<table class="table">
+    <tr>
+        <th></th>
+    </tr>
+    @{int i = 1;}
+    @foreach (var item in Model.ListComments)
+    {
+        <tr>
+            <td>
+                @i |
+                @Html.ActionLink(item.ContentCmt, "FilePDFDetail", new { id = item.IdComment }) |
+                @item.UpdateDate.ToString()|
+            </td>
+        </tr>
+        i = i + 1;
+    }
+    </table>
