@@ -1,0 +1,42 @@
+﻿body{
+    text-align: center;
+}
+#the-canvas {
+    border: 1px solid black;
+    direction: ltr;
+}
+#contextmenu{
+    width: fit-content;
+    min-width: 200px; 
+    display: flex;
+    flex-direction: column;
+    border: 1px solid gold; 
+    border-radius: 3px;
+    padding: 5px;
+    position: absolute;
+    display: none;
+    background-color: white;
+    /* rgb(226, 195, 19); */
+}
+#contextmenu > ul{
+    width: 100%;
+    margin: 0px;
+    padding: 0px;
+}
+#contextmenu > ul > li{
+    list-style: none;
+    padding: 0px;
+}
+#contextmenu > ul > li > a{
+    color: white;
+    text-decoration: none;
+}
+button{
+    background-color: rgb(226, 195, 19);;
+    height: 25px;
+    border:none;
+}
+textarea{
+    border: none;
+    /* resize: none; */
+}
