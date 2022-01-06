@@ -40,14 +40,23 @@ namespace ModulePDF.Controllers
             return View(model);
         }
 
-        public ActionResult FilePDFDetail(int id)
+        public ActionResult FilePDFDetail(string id)
         {
-            FilePDF pdfFile = db.filePDF.Single(v => v.IdFilePDF == id);
-            var listComments = from c in db.comments where c.IdFilePDF == id && c.DeleteFlag == "0"
-                               select c;
+            FilePDF pdfFile = null;
+            try
+            {
+                int idFile = Int32.Parse(id);
+                pdfFile = db.filePDF.Single(v => v.IdFilePDF == idFile);
+            }
+            catch (Exception)
+            {
+                return View("NotFound_404");
+            }
+            //var listComments = from c in db.comments where c.IdFilePDF == id && c.DeleteFlag == "0"
+            //                   select c;
             var model = new FilePDFViewModels();
             model.FilePDF = pdfFile;
-            model.ListComments = listComments.ToList();
+            //model.ListComments = listComments.ToList();
 
             return View(model);
         }

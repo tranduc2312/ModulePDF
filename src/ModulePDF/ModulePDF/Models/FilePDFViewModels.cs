@@ -87,7 +87,6 @@ namespace ModulePDF.Models
         public int PageNumber { get; set; }
         public int IdFilePDF { get; set; }
         public int IdUserCreate { get; set; }
-        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime UpdateDate { get; set; }
         public string DeleteFlag { get; set; }
     }

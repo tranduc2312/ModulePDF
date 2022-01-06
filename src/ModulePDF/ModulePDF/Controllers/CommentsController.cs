@@ -17,9 +17,10 @@ namespace ModulePDF.Controllers
         private PDFDBContext db = new PDFDBContext();
 
         // GET: api/Comments
-        public IQueryable<Comments> Getcomments(int id)
+        [Route("api/Comments/{id}/{pageNum}")]
+        public IQueryable<Comments> Getcomments(int id, int pageNum)
         {
-            return db.comments.Where(v => v.IdFilePDF == id && v.DeleteFlag == "0");
+            return db.comments.Where(v => v.IdFilePDF == id && v.DeleteFlag == "0" && v.PageNumber == pageNum);
         }
 
         /*// GET: api/Comments/5
@@ -49,8 +50,15 @@ namespace ModulePDF.Controllers
             {
                 return BadRequest();
             }
+            Comments commentsUpdate = db.comments.Find(id);
+            if (comments == null)
+            {
+                return NotFound();
+            }
+            commentsUpdate.ContentCmt = comments.ContentCmt;
+            commentsUpdate.UpdateDate = DateTime.Now;
 
-            db.Entry(comments).State = EntityState.Modified;
+            db.Entry(commentsUpdate).State = EntityState.Modified;
             try
             {
                 db.SaveChanges();
@@ -79,7 +87,7 @@ namespace ModulePDF.Controllers
             {
                 return BadRequest(ModelState);
             }
-
+            comments.UpdateDate = DateTime.Now;
             db.comments.Add(comments);
             db.SaveChanges();
 
@@ -96,10 +104,25 @@ namespace ModulePDF.Controllers
             {
                 return NotFound();
             }
-
-            db.comments.Remove(comments);
-            db.SaveChanges();
-
+            comments.DeleteFlag = "1";
+            comments.UpdateDate = DateTime.Now;
+            db.Entry(comments).State = EntityState.Modified;
+            //db.comments.Remove(comments);
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!CommentsExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
             return Ok(comments);
         }
 
