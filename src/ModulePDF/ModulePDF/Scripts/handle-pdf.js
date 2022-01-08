@@ -174,7 +174,6 @@ $("#btn-add-comment").on("click", function () {
                 $("#comment-wrap").append(html);
                 addEventForCommentDiv();
 
-                // Show comment when add new comment
                 $("#comment-wrap").css("display", "block");
                 $(".btn-show-cmt").text("Comment: On");
             })
