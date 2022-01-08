@@ -5,55 +5,41 @@
 }
 
 <div>
-    <label for="idUserCreate">User Login</label>
-    <input type="number" id="idUserCreate" value="1000" />
+    <label for="id-user-create">User Login</label>
+    <input type="number" id="id-user-create" value="1000" />
 </div>
 <h1>@Model.FilePDF.FileName</h1>
 
-<div class="btnGroup">
-    <button class="showCmt">Comment: Off</button>
-    <button class="prev">Prev</button>
+<div class="group-btn">
+    <button class="btn-show-cmt">Comment: Off</button>
+    <button class="btn-prev">Prev</button>
     &nbsp; &nbsp;
-    <span>Page: <span class="page_num"></span> / <span class="page_count"></span></span>
+    <span>Page: <span class="page-num"></span> / <span class="page-count"></span></span>
     &nbsp; &nbsp;
-    <button class="next">Next</button>
+    <button class="btn-next">Next</button>
 </div>
 
-<div id="wrap">
-    <div id="contextmenu">
-        <textarea id="contentCmt"></textarea>
+<div id="wrap-pdf">
+    <div id="context-menu">
+        <textarea id="content-cmt"></textarea>
         <i class="fas fa-window-close"></i>
-        <div class="actionBtn">
-            
-            <i class="fas fa-save" id="addComment"></i>
-            <i class="fas fa-trash" id="delComment"></i>
+        <div class="action-btn">
+            <button id="btn-add-comment"><i class="fas fa-save" ></i></button>
+            <button id="btn-del-comment"><i class="fas fa-trash" ></i></button>
         </div>
     </div>
     <canvas id="the-canvas"></canvas>
-    <div id="commentdiv">
-        @*@{ var i = 0;}
-        @foreach (var item in Model.ListComments)
-        {
-            var top = item.PositionY + "px";
-            var left = item.PositionX + "px";
-            var id = item.IdComment + "-" + item.IdUserCreate;
-            <div class="comments" id="@id" style="top: @top; left: @left ">
-                <p>
-                    @item.ContentCmt
-                </p>
-            </div>
-            i = i + 1;
-        }*@
+    <div id="comment-wrap">
     </div>
 </div>
 
-<div class="btnGroup">
-    <button class="showCmt">Comment: Off</button>
-    <button class="prev">Prev</button>
+<div class="group-btn">
+    <button class="btn-show-cmt">Comment: Off</button>
+    <button class="btn-btn-prev">Prev</button>
     &nbsp; &nbsp;
-    <span>Page: <span class="page_num"></span> / <span class="page_count"></span></span>
+    <span>Page: <span class="page-num"></span> / <span class="page-count"></span></span>
     &nbsp; &nbsp;
-    <button class="next">Next</button>
+    <button class="btn-next">Next</button>
 </div>
 
 @Scripts.Render("~/bundles/jquery")
