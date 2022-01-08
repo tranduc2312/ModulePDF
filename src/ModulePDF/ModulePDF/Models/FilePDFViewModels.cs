@@ -1,47 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Data;
 using System.Data.Entity;
-using System.Data.SqlClient;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
 namespace ModulePDF.Models
 {
-    public class ListFilePDFViewModels
-    {
-        /*public ListFilePDFViewModels()
-        {
-            ListFilePDF = new List<FilePDF>();
-            FilePDF pdf1 = new FilePDF(1, "PDF1", "/pdf/FilePDF1.pdf");
-            ListFilePDF.Add(pdf1);
-            FilePDF pdf2 = new FilePDF(2, "PDF2", "/pdf/FilePDF2.pdf");
-            ListFilePDF.Add(pdf2);
-        }*/
-        public IList<FilePDF> ListFilePDF { get; set; }
-
-        public SqlConnection getConnect()
-        {
-            return new SqlConnection(@"Data Source = .\SQLEXPRESS;Initial Catalog = ModulePDF; Integrated Security = True");
-        }
-
-        public DataTable getData()
-        {
-            SqlDataAdapter sql = new SqlDataAdapter("select * from FilePDF", getConnect());
-
-            DataSet s = new DataSet();
-            DataTable t = new DataTable();
-            return t;
-        }
-    }
-
     public class PDFDBContext : DbContext
     {
         public PDFDBContext() : base("name=PDFDBContext") {}
-        public DbSet<FilePDF> filePDF { get; set; }
-        public DbSet<Comments> comments { get; set; }
+        public DbSet<FilePDF> FilePDFDbSet { get; set; }
+        public DbSet<Comments> CommentDbSet { get; set; }
+    }
+
+    public class ListFilePDFViewModels
+    {
+        public IList<FilePDF> ListFilePDF { get; set; }
     }
 
     [Table("FilePDF")]
@@ -54,19 +28,6 @@ namespace ModulePDF.Models
         public string PathFile { get; set; }
         public DateTime UpdateDate { get; set; }
         public string DeleteFlag { get; set; }
-
-        public FilePDF() { }
-        public FilePDF(int id, string name, string path)
-        {
-            IdFilePDF = id;
-            FileName = name;
-            PathFile = path;
-        }
-        /*static void Main(string[] a)
-        {
-            FilePDF f = new FilePDF(1, "a", "b");
-            Console.WriteLine(f.FileName);
-        }*/
     }
 
     public class FilePDFViewModels
@@ -87,7 +48,6 @@ namespace ModulePDF.Models
         public int PageNumber { get; set; }
         public int IdFilePDF { get; set; }
         public int IdUserCreate { get; set; }
-        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime UpdateDate { get; set; }
         public string DeleteFlag { get; set; }
     }

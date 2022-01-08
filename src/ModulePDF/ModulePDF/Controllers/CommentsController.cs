@@ -14,26 +14,14 @@ namespace ModulePDF.Controllers
 {
     public class CommentsController : ApiController
     {
-        private PDFDBContext db = new PDFDBContext();
+        private PDFDBContext PDFDb = new PDFDBContext();
 
         // GET: api/Comments
-        public IQueryable<Comments> Getcomments(int id)
+        [Route("api/Comments/{id}/{pageNum}")]
+        public IQueryable<Comments> Getcomments(int id, int pageNum)
         {
-            return db.comments.Where(v => v.IdFilePDF == id && v.DeleteFlag == "0");
+            return PDFDb.CommentDbSet.Where(v => v.IdFilePDF == id && v.DeleteFlag == "0" && v.PageNumber == pageNum);
         }
-
-        /*// GET: api/Comments/5
-        [ResponseType(typeof(Comments))]
-        public IHttpActionResult GetComments(int id)
-        {
-            Comments comments = db.comments.Find(id);
-            if (comments == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(comments);
-        }*/
 
         // PUT: api/Comments/5
         [HttpPut]
@@ -49,11 +37,22 @@ namespace ModulePDF.Controllers
             {
                 return BadRequest();
             }
+            Comments commentsUpdate = PDFDb.CommentDbSet.Find(id);
+            if (commentsUpdate == null || comments == null)
+            {
+                return NotFound();
+            }
+            if (comments.IdUserCreate != commentsUpdate.IdUserCreate)
+            {
+                return Unauthorized();
+            }
+            commentsUpdate.ContentCmt = comments.ContentCmt;
+            commentsUpdate.UpdateDate = DateTime.Now;
 
-            db.Entry(comments).State = EntityState.Modified;
+            PDFDb.Entry(commentsUpdate).State = EntityState.Modified;
             try
             {
-                db.SaveChanges();
+                PDFDb.SaveChanges();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -67,7 +66,7 @@ namespace ModulePDF.Controllers
                 }
             }
 
-            return StatusCode(HttpStatusCode.NoContent);
+            return StatusCode(HttpStatusCode.OK);
         }
 
         // POST: api/Comments
@@ -79,9 +78,9 @@ namespace ModulePDF.Controllers
             {
                 return BadRequest(ModelState);
             }
-
-            db.comments.Add(comments);
-            db.SaveChanges();
+            comments.UpdateDate = DateTime.Now;
+            PDFDb.CommentDbSet.Add(comments);
+            PDFDb.SaveChanges();
 
             return CreatedAtRoute("DefaultApi", new { id = comments.IdComment }, comments);
         }
@@ -89,17 +88,35 @@ namespace ModulePDF.Controllers
         // DELETE: api/Comments/5
         [HttpDelete]
         [ResponseType(typeof(Comments))]
-        public IHttpActionResult DeleteComments(int id)
+        public IHttpActionResult DeleteComments(int id, Comments comments)
         {
-            Comments comments = db.comments.Find(id);
-            if (comments == null)
+            Comments commentsUpdate = PDFDb.CommentDbSet.Find(id);
+            if (commentsUpdate == null)
             {
                 return NotFound();
             }
-
-            db.comments.Remove(comments);
-            db.SaveChanges();
-
+            if (comments.IdUserCreate != commentsUpdate.IdUserCreate)
+            {
+                return Unauthorized();
+            }
+            commentsUpdate.DeleteFlag = "1";
+            commentsUpdate.UpdateDate = DateTime.Now;
+            PDFDb.Entry(commentsUpdate).State = EntityState.Modified;
+            try
+            {
+                PDFDb.SaveChanges();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!CommentsExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
             return Ok(comments);
         }
 
@@ -107,14 +124,14 @@ namespace ModulePDF.Controllers
         {
             if (disposing)
             {
-                db.Dispose();
+                PDFDb.Dispose();
             }
             base.Dispose(disposing);
         }
 
         private bool CommentsExists(int id)
         {
-            return db.comments.Count(e => e.IdComment == id) > 0;
+            return PDFDb.CommentDbSet.Count(e => e.IdComment == id) > 0;
         }
     }
 }

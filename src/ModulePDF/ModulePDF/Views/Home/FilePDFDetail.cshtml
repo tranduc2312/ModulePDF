@@ -4,195 +4,49 @@
     ViewBag.Title = "FilePDFDetail";
 }
 
-<h2>FilePDFDetail</h2>
-
 <div>
-    <h4>FilePDFViewModels</h4>
-    <hr />
-    <dl class="dl-horizontal">
-    </dl>
+    <label for="id-user-create">User Login</label>
+    <input type="number" id="id-user-create" value="1000" />
 </div>
+<h1>@Model.FilePDF.FileName</h1>
 
-<table class="table">
-    <tr>
-        <th></th>
-    </tr>
-    @{int i = 1;}
-    @foreach (var item in Model.ListComments)
-    {
-        <tr>
-            <td>
-                @i |
-                @Html.ActionLink(item.ContentCmt, "FilePDFDetail", new { id = item.IdComment }) |
-                @item.UpdateDate.ToString()|
-            </td>
-        </tr>
-        i = i + 1;
-    }
-    </table>
-
-<h1>PDF.js Previous/Next example</h1>
-
-<div>
-    <button class="prev">Previous</button>
-    <button class="next">Next</button>
+<div class="group-btn">
+    <button class="btn-show-cmt">Comment: Off</button>
+    <button class="btn-prev">Prev</button>
     &nbsp; &nbsp;
-    <span>Page: <span class="page_num"></span> / <span class="page_count"></span></span>
-</div>
-
-<canvas id="the-canvas"></canvas>
-
-<div>
-    <button class="prev">Previous</button>
-    <button class="next">Next</button>
+    <span>Page: <span class="page-num"></span> / <span class="page-count"></span></span>
     &nbsp; &nbsp;
-    <span>Page: <span class="page_num"></span> / <span class="page_count"></span></span>
+    <button class="btn-next">Next</button>
 </div>
-<div id="contextmenu">
-    <ul>
-        <li>
-            <textarea cols="20"></textarea>
-            <button id="addComment">Comment</button>
-        </li>
-    </ul>
+
+<div id="wrap-pdf">
+    <div id="context-menu">
+        <textarea id="content-cmt"></textarea>
+        <i class="fas fa-window-close"></i>
+        <div class="action-btn">
+            <button id="btn-add-comment"><i class="fas fa-save" ></i></button>
+            <button id="btn-del-comment"><i class="fas fa-trash" ></i></button>
+        </div>
+    </div>
+    <canvas id="the-canvas"></canvas>
+    <div id="comment-wrap">
+    </div>
 </div>
+
+<div class="group-btn">
+    <button class="btn-show-cmt">Comment: Off</button>
+    <button class="btn-btn-prev">Prev</button>
+    &nbsp; &nbsp;
+    <span>Page: <span class="page-num"></span> / <span class="page-count"></span></span>
+    &nbsp; &nbsp;
+    <button class="btn-next">Next</button>
+</div>
+
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/bundles/bootstrap")
 
 <script>
-    var canvas = document.getElementById("the-canvas");
-    var menu = document.getElementById("contextmenu");
-    var cmt = document.getElementById("addComment");
-    canvas.addEventListener("contextmenu", function(e) {
-        e.preventDefault();
-        console.log(e);
-        console.log(pageNum);
-
-        menu.style.top = e.pageY+'px';
-        menu.style.left = e.pageX+'px';
-        menu.style.display = 'block';
-    });
-
-    document.body.addEventListener("keyup", function(e) {
-        console.log('key')
-        if (e.keyCode == 27) {
-            menu.style.display = 'none';
-        }
-    });
-    
-    cmt.addEventListener("click", function () {
-        var url = ""
-        fetch()
-    });
-    function addMultipleEventsListener(element, ...events) {
-        for (var i = 0; i < events.length; i++) {
-            element.addEventListener(events[i], function() {
-                console.log('l')
-                menu.style.display = 'none';
-            });
-        }
-    }
-
-    // addMultipleEventsListener(canvas, 'click');
-    // addMultipleEventsListener(document.body, 'click');
+    var idFilePDF = @Model.FilePDF.IdFilePDF;
+    var url = "@Url.Content(Model.FilePDF.PathFile)";
 </script>
-<script>
-    // If absolute URL from the remote server is provided, configure the CORS
-    // header on that server.
-var url = 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf';
-
-// Loaded via <script> tag, create shortcut to access PDF.js exports.
-var pdfjsLib = window['pdfjs-dist/build/pdf'];
-
-// The workerSrc property shall be specified.
-pdfjsLib.GlobalWorkerOptions.workerSrc = '//mozilla.github.io/pdf.js/build/pdf.worker.js';
-
-var pdfDoc = null,
-    pageNum = 1,
-    pageRendering = false,
-    pageNumPending = null,
-    scale = 2,
-    canvas = document.getElementById('the-canvas'),
-    ctx = canvas.getContext('2d');
-
-/**
- * Get page info from document, resize canvas accordingly, and render page.
- * param num Page number.
- */
-function renderPage(num) {
-  pageRendering = true;
-  // Using promise to fetch the page
-  pdfDoc.getPage(num).then(function(page) {
-    var viewport = page.getViewport({scale: scale});
-    canvas.height = viewport.height;
-    canvas.width = viewport.width;
-
-    // Render PDF page into canvas context
-    var renderContext = {
-      canvasContext: ctx,
-      viewport: viewport
-    };
-    var renderTask = page.render(renderContext);
-
-    // Wait for rendering to finish
-    renderTask.promise.then(function() {
-      pageRendering = false;
-      if (pageNumPending !== null) {
-        // New page rendering is pending
-        renderPage(pageNumPending);
-        pageNumPending = null;
-      }
-    });
-  });
-
-  // Update page counters
-  document.querySelectorAll('.page_num').forEach(v => {v.textContent = num });
-}
-
-/**
- * If another page rendering in progress, waits until the rendering is
- * finised. Otherwise, executes rendering immediately.
- */
-function queueRenderPage(num) {
-  if (pageRendering) {
-    pageNumPending = num;
-  } else {
-    renderPage(num);
-  }
-  window.scrollTo(0, 0);
-}
-
-/**
- * Displays previous page.
- */
-function onPrevPage() {
-  if (pageNum <= 1) {
-    return;
-  }
-  pageNum--;
-  queueRenderPage(pageNum);
-}
-document.querySelectorAll('.prev').forEach(v => {v.addEventListener('click', onPrevPage)});
-
-/**
- * Displays next page.
- */
-function onNextPage() {
-  if (pageNum >= pdfDoc.numPages) {
-    return;
-  }
-  pageNum++;
-  queueRenderPage(pageNum);
-}
-document.querySelectorAll('.next').forEach(v => {v.addEventListener('click', onNextPage)});
-
-/**
- * Asynchronously downloads PDF.
- */
-pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
-  pdfDoc = pdfDoc_;
-  document.querySelectorAll('.page_count').forEach(v => {v.textContent = pdfDoc.numPages});
-
-  // Initial/first page rendering
-  renderPage(pageNum);
-});
-
-</script>
+<script src="@Url.Content("/Scripts/handle-pdf.js")"> </script>

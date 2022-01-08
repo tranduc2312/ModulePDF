@@ -5,21 +5,24 @@
 
 <h2>ListFilePDF</h2>
 
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
 <table class="table">
     <tr>
-        <th></th>
+        <th>#</th>
+        <th>File Name</th>
+        <th>Update Date</th>
     </tr>
 
 @{int i = 1;}
 @foreach (var item in Model.ListFilePDF) {
     <tr>
         <td>
-            @i |
-            @Html.ActionLink(item.FileName, "FilePDFDetail", new { id=item.IdFilePDF }) |
-            @item.UpdateDate.ToString()|
+            @i
+        </td>
+        <td>
+            @Html.ActionLink(item.FileName, "FilePDFDetail", new { id = item.IdFilePDF })
+        </td>
+        <td>
+            @item.UpdateDate.ToString()
         </td>
     </tr>
     i = i + 1;
