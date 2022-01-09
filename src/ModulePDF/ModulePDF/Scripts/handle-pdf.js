@@ -103,6 +103,7 @@ $("#the-canvas").on("contextmenu", function (e) {
         $("#btn-del-comment").attr("disabled", "true");
         $("#context-menu").css({ "top": e.offsetY + "px", "left": e.offsetX + "px", "display": "block" });
         isAddNew = true;
+        idComment = 0;
     } else {
         warningEditting();
     }
@@ -207,6 +208,7 @@ $(".btn-show-cmt").on("click", function () {
     if (!showStatus) {
         $("#comment-wrap").css("display", "block");
         $(this).text("Comment: On");
+        getCommentPage();
     } else {
         $("#comment-wrap").css("display", "none");
         $(this).text("Comment: Off")
