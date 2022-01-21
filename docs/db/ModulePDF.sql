@@ -28,7 +28,8 @@ values
 ,('PDF Sample 4', '/pdf/PDF Sample 4.pdf')
 ,('PDF Sample 5', '/pdf/PDF Sample 5.pdf')
 ,('PDF Sample 6', '/pdf/PDF Sample 6.pdf')
-,('PDF Sample 7', '/pdf/PDF Sample 7.pdf');
+,('PDF Sample 7', '/pdf/PDF Sample 7.pdf')
+,('PDF Sample 8', '/pdf/PDF Sample 8.pdf');
 
 insert into Comments (contentCmt, positionX , positionY, pageNumber, idFilePDF, idUserCreate)
 values 
