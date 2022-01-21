@@ -16,7 +16,6 @@ $("body").on("click", function (e) {
     else warningEditting();
 });
 $(".btn-show-cmt").on("click", function () {
-    console.log("btn-show-cmt click");
     if (!showStatus) {
         $(".comment-wrap").css("display", "block");
         $(this).addClass("toggled");
@@ -30,7 +29,10 @@ $(".btn-show-cmt").on("click", function () {
     }
     resetData();
     showStatus = !showStatus;
-})
+});
+$("#next").on("click", function () { getCommentPage(parseInt($("#pageNumber").val()) + 1); });
+$("#previous").on("click", function () { getCommentPage(parseInt($("#pageNumber").val()) - 1); });
+$("#pageNumber").on("change", function () { getCommentPage($(this).val()); });
 function addContextMenu(parent) {
     $("#context-menu").remove();
     var menu = `<div id="context-menu">
@@ -45,15 +47,12 @@ function addContextMenu(parent) {
 
     // add event for contextmenu
     $(".fa-window-close").on("click", function () {
-        console.log(".fa-window-close click");
         resetData()
     });
     $("#context-menu").on("click", function (e) {
-        console.log("#context-menu click");
         e.stopPropagation();
     });
     $("#content-cmt").on("keyup", function () {
-        console.log("#content-cmt keyup");
         if ($(this).val() != oldContent) {
             canSave = true;
             $("#btn-add-comment").removeAttr("disabled");
@@ -63,7 +62,6 @@ function addContextMenu(parent) {
         }
     });
     $("#btn-add-comment").on("click", function () {
-        console.log("#btn-add-comment");
         if ($("#content-cmt").val().length > 0) {
             if (idComment != 0 && canSave) {
                 var url = "/api/Comments/" + idComment;
@@ -113,7 +111,6 @@ function addContextMenu(parent) {
         }
     });
     $("#btn-del-comment").on("click", function () {
-        console.log("#btn-del-comment");
         if (idComment != 0 && !isAddNew) {
             var userCreate = $("#id-user-create").val();
             var url = "/api/Comments/" + idComment;
@@ -137,9 +134,7 @@ function addContextMenu(parent) {
         }
     });
 }
-
 function addEventForCanvas() {
-    console.log("add event");
     $(".comment-wrap").unbind("contextmenu");
     $(".comment-wrap").on("contextmenu", function (e) {
         e.preventDefault();
@@ -147,15 +142,12 @@ function addEventForCanvas() {
         if (!canSave) {
 
             addContextMenu($(this));
-
             var computeStyle = getComputedStyle(document.documentElement);
             var scale = computeStyle.getPropertyValue("--zoom-factor");
-            console.log('scale', scale);
             posX = Math.round(e.offsetX / scale);
             posY = Math.round(e.offsetY / scale);
             var hColor = (parseInt($("#id-user-create").val()) % 1000 + 1) * 36;
             var bgColor = 'hsl(' + hColor + 'deg 81% 55%);'
-            console.log(bgColor);
             $("#context-menu").css({
                 "top": e.offsetY + "px",
                 "left": e.offsetX + "px",
@@ -169,7 +161,6 @@ function addEventForCanvas() {
             $("#content-cmt").focus();
             $("#btn-add-comment").attr("disabled", "true");
             $("#btn-del-comment").attr("disabled", "true");
-            console.log(e);
             isAddNew = true;
             idComment = 0;
         } else {
@@ -183,13 +174,11 @@ function addEventForCanvas() {
         else warningEditting();
     });
 }
-
 function getCommentPage(...num) {
     var page = parseInt($("#pageNumber").val());
     if (num.length > 0) {
         page = num[0];
     }
-    console.log(page);
     $("#comment-wrap-" + page).html("");
 
     var url = "/api/Comments/" + idFilePDF + "/" + page;
@@ -205,7 +194,6 @@ function getCommentPage(...num) {
         var html = "";
         var computeStyle = getComputedStyle(document.documentElement);
         var scale = computeStyle.getPropertyValue("--zoom-factor");
-        console.log('scale', scale);
         data.forEach(item => {
             var top = (scale * parseInt(item.PositionY)) + "px";
             var left = (scale * parseInt(item.PositionX)) + "px";
@@ -224,23 +212,15 @@ function getCommentPage(...num) {
         resetData();
     })
 }
-$("#next").on("click", function () { getCommentPage(parseInt($("#pageNumber").val()) + 1);  });
-$("#previous").on("click", function () { getCommentPage(parseInt($("#pageNumber").val()) - 1); });
-$("#pageNumber").on("change", function () {
-    console.log("pagenum: change");
-    getCommentPage($(this).val());
-});
 function addEventForCommentDiv() {
     $(".comments").unbind("contextmenu");
     $(".comments").on("contextmenu", function (e) {
-        console.log("contextmenu comment");
         e.preventDefault();
         e.stopPropagation();
         eventForCommentDiv(this);
     });
     $(".comments").unbind("click");
     $(".comments").on("click", function (e) {
-        console.log("click comment");
         e.stopPropagation();
         eventForCommentDiv(this);
     });
@@ -285,7 +265,6 @@ function eventForCommentDiv(el) {
         warningEditting();
     }
 }
-
 function warningEditting() {
     $("#context-menu").css({
         "animation": "blink 1s linear infinite"

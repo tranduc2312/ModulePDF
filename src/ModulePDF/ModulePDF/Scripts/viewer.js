@@ -12251,11 +12251,8 @@ class PDFPageView {
       div.appendChild(commentWrap);
     }
 
-    // DucTV ADD Start
-        console.log("add DIV "+this.id);
-        addEventForCanvas();
-        getCommentPage(this.id);
-    // DucTV ADD End
+    addEventForCanvas();
+    getCommentPage(this.id);
     // DucTV add comment wrap
 
     if (this.#annotationMode !== _pdfjsLib.AnnotationMode.DISABLE && this.annotationLayerFactory) {

@@ -10,10 +10,16 @@
     border: 1px solid #aaaaaa;
     text-align: left;
 }
-td, th {
-    border: 1px solid #aaaaaa;
+tr {
+    border-bottom: 1px solid #aaaaaa;
+}
+td, th{
     width: auto;
     padding: 10px
+}
+#btnPagePrev{
+}
+#btnPageNext{
 }
 #wrap-pdf{
     width: 100%;
@@ -102,17 +108,18 @@ td, th {
     /* 1px solid rgb(226, 195, 19); */
 }
 button{
-    border: 1px solid rgb(226, 195, 19);
-    border-radius: 5px;
-    background-color: rgb(226, 195, 19);
-    color: white;
+    /*border: 1px solid rgb(226, 195, 19);*/
+    /*border-radius: 5px;*/
+    /*background-color: rgb(226, 195, 19);*/
+    /*color: white;*/
+    padding: 0px 5px;
 }
 button:hover{
-    background-color: goldenrod;
+    /*background-color: goldenrod;*/
 }
 input {
-    border: 1px solid;
-    border-radius: 5px;
+    /*border: 1px solid;*/
+    /*border-radius: 5px;*/
 }
 .comment-wrap{
     position: absolute;
