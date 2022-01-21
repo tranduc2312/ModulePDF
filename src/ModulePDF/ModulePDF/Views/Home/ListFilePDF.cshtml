@@ -5,27 +5,109 @@
 
 <h2>ListFilePDF</h2>
 
-<table class="table">
-    <tr>
-        <th>#</th>
-        <th>File Name</th>
-        <th>Update Date</th>
-    </tr>
+<div style="width: 80%; margin: 10px auto;">
+    <form action="FindListFilePDF" method="post">
+        <input type="text" value="@Model.FindName" name="findName"/>
+        <input type="hidden" value="@Model.PageNum" name="pageNum" />
+        <input type="hidden" value="@Model.PageTotal" name="pageTotal" />
+        <input type="hidden" value="@Model.OrderBy" name="orderBy"/>
+        <input type="hidden" value="@Model.OrderType" name="orderType"/>
+        <button id="btnFind">Tìm kiếm</button>
+    <div style="width:100%; margin-top: 10px; display: flex; flex-direction: row-reverse;line-height: 20px;
+    font-size: 15px;">
+        <label for="offset">entries</label>
+        <select id="offset" name="offset">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+        </select>
+        <label for="offset">Show</label>
+    </div>
+    </form>
+    <table class="table">
+        <tr>
+            <th># <i class="fas fa-sort"></i></th>
+            <th>File Name <i class="fas fa-sort"></i></th>
+            <th>Update Date <i class="fas fa-sort"></i></th>
+        </tr>
 
-@{int i = 1;}
-@foreach (var item in Model.ListFilePDF) {
-    <tr>
-        <td>
-            @i
-        </td>
-        <td>
-            @Html.ActionLink(item.FileName, "FilePDFDetail", new { id = item.IdFilePDF })
-        </td>
-        <td>
-            @item.UpdateDate.ToString()
-        </td>
-    </tr>
-    i = i + 1;
-}
+        @{int i = 1;}
+        @foreach (var item in Model.ListFilePDF)
+    {
+            <tr>
+                <td>
+                    @i
+                </td>
+                <td>
+                    @Html.ActionLink(item.FileName, "FilePDFDetail", new { id = item.IdFilePDF })
+                </td>
+                <td>
+                    @item.UpdateDate.ToString()
+                </td>
+            </tr>
+        i = i + 1;
+    }
+    </table>
 
-</table>
+</div>
+<div>
+    <button id="btnPagePrev">Prev</button>
+    <button id="btnPageNext">Next</button>
+</div>
+
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/bundles/bootstrap")
+<script>
+    var offsetTemp = @Model.Offset;
+    const offsetMap = [10,25,50,100];
+    $("#offset")[0].selectedIndex = offsetMap.indexOf(offsetTemp);
+    $("#btnFind").on("click", function (e) {
+        e.preventDefault();
+        $("input[name='pageNum']").val(1);
+        $("form").submit();
+    });
+    $("#btnPagePrev").on("click", function () {
+        var pageNum = $("input[name='pageNum']");
+        if (pageNum.val() > 1) {
+            pageNum.val(parseInt(pageNum.val()) - 1);
+            $("form").submit();
+        }
+    });
+    $("#btnPageNext").on("click", function () {
+        var pageNum = $("input[name='pageNum']");
+        var pageTotal = $("input[name='pageTotal']");
+        if (pageTotal.val() > pageNum.val()) {
+            pageNum.val(parseInt(pageNum.val()) + 1);
+            $("form").submit();
+        }
+    });
+    $("#offset").on("change", function(){
+        $("form").submit();
+    });
+    $(".fa-sort").on("click", function() {
+        var parentName = $(this).parent("th").text();
+        console.log(parentName.indexOf("File Name"));
+        if (parentName.indexOf("#") >= 0) {
+            $("input[name='orderBy']").val("1");
+            setOrderType("1");
+        } else if (parentName.indexOf("File Name") >= 0) {
+            $("input[name='orderBy']").val("2");
+            setOrderType("2");
+        } else {
+            $("input[name='orderBy']").val("3");
+            setOrderType("3");
+        }
+        $("form").submit();
+    });
+    function setOrderType(newOrderby) {
+        var type = $("input[name='orderType']");
+        var oldOrderby = $("input[name='orderBy']").val();
+        console.log(newOrderby, oldOrderby, newOrderby == oldOrderby);
+        if (oldOrderby == newOrderby && type.val() == "asc") {
+            type.val("desc");
+        } else {
+            type.val("asc");
+        }
+    }
+</script>

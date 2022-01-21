@@ -16,6 +16,12 @@ namespace ModulePDF.Models
     public class ListFilePDFViewModels
     {
         public IList<FilePDF> ListFilePDF { get; set; }
+        public string FindName { get; set; }
+        public int PageNum { get; set; }
+        public int Offset { get; set; }
+        public int PageTotal { get; set; }
+        public string OrderBy { get; set; }
+        public string OrderType { get; set; }
     }
 
     [Table("FilePDF")]

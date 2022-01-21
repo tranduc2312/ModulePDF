@@ -1,229 +1,187 @@
-﻿var pdfjsLib = window['pdfjs-dist/build/pdf'];
-
-pdfjsLib.GlobalWorkerOptions.workerSrc = '//mozilla.github.io/pdf.js/build/pdf.worker.js';
-
-var pdfDoc = null,
-    pageNum = 1,
-    pageRendering = false,
-    pageNumPending = null,
-    scale = 1,
-    canvas = $('#the-canvas')[0]
-    ctx = canvas.getContext('2d'),
-    pdfWidthFixed = 1170;
-
-function renderPage(num) {
-    pageRendering = true;
-
-    pdfDoc.getPage(num).then(function(page) {
-        var viewport = page.getViewport({ scale: scale });
-        var reScale = viewport.width / pdfWidthFixed;
-        if (viewport.width < pdfWidthFixed) {
-            reScale = pdfWidthFixed / viewport.width;
-        }
-        viewport = page.getViewport({ scale: reScale });
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
-        $("#wrap-pdf").css({"width" : viewport.width, "height" : viewport.height });
-
-        var renderContext = {
-            canvasContext: ctx,
-            viewport: viewport
-        };
-        var renderTask = page.render(renderContext);
-
-        renderTask.promise.then(function() {
-            pageRendering = false;
-            if (pageNumPending !== null) {
-
-                renderPage(pageNumPending);
-                pageNumPending = null;
-            }
-        });
-    });
-
-    $('.page-num').text(num);
-    $('#the-canvas').css({ "border": "1px solid black" });
-    getCommentPage();
-}
-
-function queueRenderPage(num) {
-    if (pageRendering) {
-        pageNumPending = num;
-    } else {
-        renderPage(num);
-    }
-    window.scrollTo(0, 0);
-}
-
-function onPrevPage() {
-    if (pageNum <= 1) {
-        return;
-    }
-    pageNum--;
-    queueRenderPage(pageNum);
-}
-
-function onNextPage() {
-    if (pageNum >= pdfDoc.numPages) {
-        return;
-    }
-    pageNum++;
-    queueRenderPage(pageNum);
-}
-
-pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
-    pdfDoc = pdfDoc_;
-    $('.page-count').text(pdfDoc.numPages);
-
-    renderPage(pageNum);
-});
-
-$(".btn-next").on("click", onNextPage);
-$(".btn-prev").on("click", onPrevPage);
-
-var posX = 0, posY = 0;
+﻿var posX = 0, posY = 0;
 var idComment = 0;
 var isAddNew = false;
 var canSave = false;
-var oldContent = null;
+var oldContent = "";
 var showStatus = false;
 
-$("#the-canvas").on("contextmenu", function (e) {
-    e.preventDefault();
-
-    if (!canSave) {
-        posX = e.offsetX;
-        posY = e.offsetY;
-        $("#btn-add-comment").css("display", "block");
-        $("#btn-del-comment").css("display", "none");
-        $("#content-cmt").removeAttr("readonly");
-        $("#content-cmt").val("");
-        $("#content-cmt").focus();
-        $("#btn-add-comment").attr("disabled", "true");
-        $("#btn-del-comment").attr("disabled", "true");
-        $("#context-menu").css({ "top": e.offsetY + "px", "left": e.offsetX + "px", "display": "block" });
-        isAddNew = true;
-        idComment = 0;
-    } else {
-        warningEditting();
-    }
-});
 $("body").on("keyup", function (e) {
     if (e.keyCode == 27) {
         if (!canSave) resetData();
         else warningEditting();
     }
 });
-$("#the-canvas").on("click", function (e) {
-    if (!canSave) resetData();
-    else warningEditting();
-});
 $("body").on("click", function (e) {
     if (!canSave) resetData();
     else warningEditting();
 });
-$("#btn-add-comment").on("click", function () {
-    if ($("#content-cmt").val().length > 0) {
-        if (idComment != 0 && canSave) {
+$(".btn-show-cmt").on("click", function () {
+    if (!showStatus) {
+        $(".comment-wrap").css("display", "block");
+        $(this).addClass("toggled");
+        $("#pageRotateCw")[0].disabled = true;
+        $("#pageRotateCcw")[0].disabled = true;
+    } else {
+        $(".comment-wrap").css("display", "none");
+        $(this).removeClass("toggled");
+        $("#pageRotateCw")[0].disabled = false;
+        $("#pageRotateCcw")[0].disabled = false;
+    }
+    resetData();
+    showStatus = !showStatus;
+});
+$("#next").on("click", function () { getCommentPage(parseInt($("#pageNumber").val()) + 1); });
+$("#previous").on("click", function () { getCommentPage(parseInt($("#pageNumber").val()) - 1); });
+$("#pageNumber").on("change", function () { getCommentPage($(this).val()); });
+function addContextMenu(parent) {
+    $("#context-menu").remove();
+    var menu = `<div id="context-menu">
+                    <textarea id="content-cmt"></textarea>
+                    <i class="fas fa-window-close"></i>
+                    <div class="action-btn">
+                        <button id="btn-add-comment"><i class="fas fa-save"></i></button>
+                        <button id="btn-del-comment"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>`;
+    parent.append(menu);
+
+    // add event for contextmenu
+    $(".fa-window-close").on("click", function () {
+        resetData()
+    });
+    $("#context-menu").on("click", function (e) {
+        e.stopPropagation();
+    });
+    $("#content-cmt").on("keyup", function () {
+        if ($(this).val() != oldContent) {
+            canSave = true;
+            $("#btn-add-comment").removeAttr("disabled");
+        } else {
+            canSave = false;
+            $("#btn-add-comment").attr("disabled", "disabled");
+        }
+    });
+    $("#btn-add-comment").on("click", function () {
+        if ($("#content-cmt").val().length > 0) {
+            if (idComment != 0 && canSave) {
+                var url = "/api/Comments/" + idComment;
+                var data = {
+                    IdComment: idComment,
+                    ContentCmt: $("#content-cmt").val(),
+                    IdUserCreate: $("#id-user-create").val()
+                }
+                fetch(url, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data)
+                }).then(function (res) {
+                    if (res.status == 200) {
+                        resetData();
+                        getCommentPage();
+                    }
+                });
+            }
+            else if (isAddNew && canSave) {
+                var pageNum = parseInt($("#pageNumber").val());
+                var url = "/api/Comments";
+                var data = {
+                    ContentCmt: $("#content-cmt").val(),
+                    IdFilePDF: idFilePDF,
+                    IdUserCreate: $("#id-user-create").val(),
+                    PageNumber: pageNum,
+                    PositionX: posX,
+                    PositionY: posY,
+                    DeleteFlag: '0'
+                }
+                fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data)
+                }).then(function (res) {
+                    return res.json();
+                }).then(function (item) {
+                    resetData();
+                    getCommentPage();
+                })
+            }
+        }
+    });
+    $("#btn-del-comment").on("click", function () {
+        if (idComment != 0 && !isAddNew) {
+            var userCreate = $("#id-user-create").val();
             var url = "/api/Comments/" + idComment;
             var data = {
-                IdComment: idComment,
-                ContentCmt: $("#content-cmt").val(),
-                IdUserCreate: $("#id-user-create").val()
+                IdUserCreate: userCreate
             }
             fetch(url, {
-                method: "PUT",
+                method: "DELETE",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify(data)
             }).then(function (res) {
                 if (res.status == 200) {
+                    $("#" + idComment + "-" + userCreate).remove();
                     resetData();
-                    getCommentPage();
                 }
             });
+        } else {
+            resetData();
         }
-        else if (isAddNew && canSave) {
-            var url = "/api/Comments";
-            var data = {
-                ContentCmt: $("#content-cmt").val(),
-                IdFilePDF: idFilePDF,
-                IdUserCreate: $("#id-user-create").val(),
-                PageNumber: pageNum,
-                PositionX: posX,
-                PositionY: posY,
-                DeleteFlag: '0'
-            }
-            fetch(url, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(data)
-            }).then(function (res) {
-                return res.json();
-            }).then(function (item) {
-                resetData();
-                var top = item.PositionY + "px";
-                var left = item.PositionX + "px";
-                var id = item.IdComment + "-" + item.IdUserCreate;
-                var html = "";
-                html += `<div class="comments" id="${id}" style="top: ${top}; left: ${left} ">
-                                    ${item.ContentCmt}
-                            </div>`;
-                $("#comment-wrap").append(html);
-                addEventForCommentDiv();
+    });
+}
+function addEventForCanvas() {
+    $(".comment-wrap").unbind("contextmenu");
+    $(".comment-wrap").on("contextmenu", function (e) {
+        e.preventDefault();
 
-                $("#comment-wrap").css("display", "block");
-                $(".btn-show-cmt").text("Comment: On");
-            })
-        }
-    }
-});
-$("#btn-del-comment").on("click", function () {
-    if (idComment != 0 && !isAddNew) {
-        var userCreate = $("#id-user-create").val();
-        var url = "/api/Comments/" + idComment;
-        var data = {
-            IdUserCreate: userCreate
-        }
-        fetch(url, {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
-        }).then(function (res) {
-            if (res.status == 200) {
-                $("#" + idComment + "-" + userCreate).remove();
-                resetData();
-            }
-        });
-    } else {
-        resetData();
-    }
-});
-$(".btn-show-cmt").on("click", function () {
-    if (!showStatus) {
-        $("#comment-wrap").css("display", "block");
-        $(this).text("Comment: On");
-        getCommentPage();
-    } else {
-        $("#comment-wrap").css("display", "none");
-        $(this).text("Comment: Off")
-    }
-    resetData();
-    showStatus = !showStatus;
-})
-$(".fa-window-close").on("click", function () { resetData() });
-$("#context-menu").on("click", function (e) {
-    e.stopPropagation();
-});
-function getCommentPage() {
-    $("#comment-wrap").html("");
+        if (!canSave) {
 
-    var url = "/api/Comments/" + idFilePDF + "/" + pageNum;
+            addContextMenu($(this));
+            var computeStyle = getComputedStyle(document.documentElement);
+            var scale = computeStyle.getPropertyValue("--zoom-factor");
+            posX = Math.round(e.offsetX / scale);
+            posY = Math.round(e.offsetY / scale);
+            var hColor = (parseInt($("#id-user-create").val()) % 1000 + 1) * 36;
+            var bgColor = 'hsl(' + hColor + 'deg 81% 55%);'
+            $("#context-menu").css({
+                "top": e.offsetY + "px",
+                "left": e.offsetX + "px",
+                "display": "block",
+                "border": "1px solid " + bgColor
+            });
+            $("#btn-add-comment").css("display", "block");
+            $("#btn-del-comment").css("display", "none");
+            $("#content-cmt").removeAttr("readonly");
+            $("#content-cmt").val("");
+            $("#content-cmt").focus();
+            $("#btn-add-comment").attr("disabled", "true");
+            $("#btn-del-comment").attr("disabled", "true");
+            isAddNew = true;
+            idComment = 0;
+        } else {
+            warningEditting();
+        }
+    });
+
+    $(".comment-wrap").unbind("click");
+    $(".comment-wrap").on("click", function (e) {
+        if (!canSave) resetData();
+        else warningEditting();
+    });
+}
+function getCommentPage(...num) {
+    var page = parseInt($("#pageNumber").val());
+    if (num.length > 0) {
+        page = num[0];
+    }
+    $("#comment-wrap-" + page).html("");
+
+    var url = "/api/Comments/" + idFilePDF + "/" + page;
     fetch(url, {
         method: "GET",
         headers: {
@@ -234,25 +192,34 @@ function getCommentPage() {
     }).then(function (data) {
 
         var html = "";
+        var computeStyle = getComputedStyle(document.documentElement);
+        var scale = computeStyle.getPropertyValue("--zoom-factor");
         data.forEach(item => {
-            var top = item.PositionY + "px";
-            var left = item.PositionX + "px";
+            var top = (scale * parseInt(item.PositionY)) + "px";
+            var left = (scale * parseInt(item.PositionX)) + "px";
             var id = item.IdComment + "-" + item.IdUserCreate;
-            html += `<div class="comments" id="${id}" style="top: ${top}; left: ${left} ">
+            var hColor = ((item.IdUserCreate%1000 + 1)*36);
+            var bgColor = 'hsl('+ hColor  +'deg 81% 55%);'
+            html += `<div class="comments" id="${id}" style="top: ${top}; left: ${left}; background-color: ${bgColor} ">
                             ${item.ContentCmt}
                     </div>`;
         });
-        $("#comment-wrap").html(html);
+        var show = showStatus ? "block" : "none";
+        $("#comment-wrap-" + page).css("display", show);
+        $("#comment-wrap-" + page).html(html);
 
         addEventForCommentDiv();
         resetData();
     })
 }
 function addEventForCommentDiv() {
+    $(".comments").unbind("contextmenu");
     $(".comments").on("contextmenu", function (e) {
         e.preventDefault();
+        e.stopPropagation();
         eventForCommentDiv(this);
     });
+    $(".comments").unbind("click");
     $(".comments").on("click", function (e) {
         e.stopPropagation();
         eventForCommentDiv(this);
@@ -263,6 +230,17 @@ function eventForCommentDiv(el) {
         var id = el.id.split("-");
         var idCmt = id[0];
         var userCreate = id[1];
+
+        addContextMenu($(el).parent(".comment-wrap"));
+
+        var computeStyle = getComputedStyle(el);
+        var hColor = computeStyle.getPropertyValue("background-color");
+        $("#context-menu").css({
+            "top": $(el).css("top"),
+            "left": $(el).css("left"),
+            "display": "block",
+            "border-color": hColor
+        });
         $("#content-cmt").val($(el).text().trim());
         isAddNew = false;
         if (userCreate == $("#id-user-create").val()) {
@@ -283,20 +261,10 @@ function eventForCommentDiv(el) {
             $("#btn-del-comment").css("display", "none");
             $("#content-cmt").attr("readonly", "true");
         }
-        $("#context-menu").css({ "top": $(el).css("top"), "left": $(el).css("left"), "display": "block" });
     } else {
         warningEditting();
     }
 }
-$("#content-cmt").on("keyup", function () {
-    if ($(this).val() != oldContent) {
-        canSave = true;
-        $("#btn-add-comment").removeAttr("disabled");
-    } else {
-        canSave = false;
-        $("#btn-add-comment").attr("disabled", "disabled");
-    }
-});
 function warningEditting() {
     $("#context-menu").css({
         "animation": "blink 1s linear infinite"
@@ -310,5 +278,5 @@ function resetData() {
     $("#content-cmt").val("");
     idComment = 0;
     canSave = false;
-    oldContent = null;
+    oldContent = "";
 }

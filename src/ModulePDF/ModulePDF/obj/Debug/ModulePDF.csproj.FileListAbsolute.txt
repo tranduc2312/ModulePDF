@@ -153,3 +153,17 @@ F:\Freelance\PDFView\src\ModulePDF\ModulePDF\bin\Microsoft.AspNet.Identity.Entit
 F:\Freelance\PDFView\src\ModulePDF\ModulePDF\obj\Debug\ModulePDF.csprojResolveAssemblyReference.cache
 F:\Freelance\PDFView\src\ModulePDF\ModulePDF\obj\Debug\ModulePDF.dll
 F:\Freelance\PDFView\src\ModulePDF\ModulePDF\obj\Debug\ModulePDF.pdb
+F:\Freelance\PDFView\src\ModulePDF\ModulePDF\bin\itext.barcodes.dll
+F:\Freelance\PDFView\src\ModulePDF\ModulePDF\bin\itext.forms.dll
+F:\Freelance\PDFView\src\ModulePDF\ModulePDF\bin\itext.io.dll
+F:\Freelance\PDFView\src\ModulePDF\ModulePDF\bin\itext.kernel.dll
+F:\Freelance\PDFView\src\ModulePDF\ModulePDF\bin\itext.layout.dll
+F:\Freelance\PDFView\src\ModulePDF\ModulePDF\bin\itext.pdfa.dll
+F:\Freelance\PDFView\src\ModulePDF\ModulePDF\bin\itext.sign.dll
+F:\Freelance\PDFView\src\ModulePDF\ModulePDF\bin\itext.barcodes.xml
+F:\Freelance\PDFView\src\ModulePDF\ModulePDF\bin\itext.forms.xml
+F:\Freelance\PDFView\src\ModulePDF\ModulePDF\bin\itext.io.xml
+F:\Freelance\PDFView\src\ModulePDF\ModulePDF\bin\itext.kernel.xml
+F:\Freelance\PDFView\src\ModulePDF\ModulePDF\bin\itext.layout.xml
+F:\Freelance\PDFView\src\ModulePDF\ModulePDF\bin\itext.pdfa.xml
+F:\Freelance\PDFView\src\ModulePDF\ModulePDF\bin\itext.sign.xml

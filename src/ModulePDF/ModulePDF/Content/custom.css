@@ -10,10 +10,16 @@
     border: 1px solid #aaaaaa;
     text-align: left;
 }
-td, th {
-    border: 1px solid #aaaaaa;
+tr {
+    border-bottom: 1px solid #aaaaaa;
+}
+td, th{
     width: auto;
     padding: 10px
+}
+#btnPagePrev{
+}
+#btnPageNext{
 }
 #wrap-pdf{
     width: 100%;
@@ -27,19 +33,19 @@ td, th {
     max-width: 350px; 
     height: 150px;
     border: 1px solid gold; 
-    border-radius: 3px;
+    border-radius: 1px;
     padding: 5px;
     position: absolute;
     display: none;
     z-index: 11;
     background-color: white;
     /* rgb(226, 195, 19); */
-    box-shadow: 3px 3px 10px #719ECE;
+    box-shadow: 1px 1px 5px #719ECE;
 }
-#the-canvas {
-    /*border: 1px solid black;*/
+/*#the-canvas {
+    border: 1px solid black;
     direction: ltr;
-}
+}*/
 .fa-window-close{
     position: absolute;
     top: 1px;
@@ -102,24 +108,24 @@ td, th {
     /* 1px solid rgb(226, 195, 19); */
 }
 button{
-    border: 1px solid rgb(226, 195, 19);
-    border-radius: 5px;
-    background-color: rgb(226, 195, 19);
-    color: white;
+    /*border: 1px solid rgb(226, 195, 19);*/
+    /*border-radius: 5px;*/
+    /*background-color: rgb(226, 195, 19);*/
+    /*color: white;*/
+    padding: 0px 5px;
 }
 button:hover{
-    background-color: goldenrod;
+    /*background-color: goldenrod;*/
 }
 input {
-    border: 1px solid;
-    border-radius: 5px;
+    /*border: 1px solid;*/
+    /*border-radius: 5px;*/
 }
-#comment-wrap{
-    width:100%;
-    height:auto;
-    position:absolute;
-    top:0px;
-    display:none;
+.comment-wrap{
+    position: absolute;
+    top: 0px;
+    display: none;
+    /*cursor: url(images/secondaryToolbarButton-commentAltSolid.svg), auto;*/
 }
 .comments {
     width: fit-content;
@@ -127,15 +133,15 @@ input {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    min-width: 50px;
-    max-width: 100px;
+    max-width: 200px;
     z-index: 10;
-    border: 1px solid gold;
-    border-radius: 3px;
+    /*border: 1px solid wheat;*/
+    border-radius: 1px;
     padding: 5px;
     position: absolute;
     background-color: wheat; /*white;*/
     cursor: pointer;
+    box-shadow: 1px 1px 2px gray;
 }
 @keyframes blink{
     0%   {border: 2px dashed #312c11;}
@@ -144,4 +150,7 @@ input {
     60%  {border: 1px solid gold;}
     80%  {border: 2px dashed #312c11;}
     100% {border: 1px solid gold;}
+}
+.user-login{
+    width: 45px;
 }
